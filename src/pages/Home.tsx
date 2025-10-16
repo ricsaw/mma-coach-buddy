@@ -2,26 +2,22 @@ import { Flame, Target, Zap, Award, Dumbbell, Apple } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { AICoach } from "@/components/AICoach";
+import { useFitness } from "@/contexts/FitnessContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const dailyStats = {
-    caloriesConsumed: 1850,
-    caloriesTarget: 2400,
-    caloriesBurned: 420,
-    streak: 7,
-    protein: { current: 145, target: 160 },
-    carbs: { current: 180, target: 200 },
-    fat: { current: 62, target: 70 },
-  };
+  const { userProfile, dailyStats, caloriesTarget, macrosTarget, streak } = useFitness();
+  const navigate = useNavigate();
 
-  const caloriesRemaining = dailyStats.caloriesTarget - dailyStats.caloriesConsumed + dailyStats.caloriesBurned;
-  const caloriesProgress = (dailyStats.caloriesConsumed / dailyStats.caloriesTarget) * 100;
+  const caloriesRemaining = caloriesTarget - dailyStats.caloriesConsumed + dailyStats.caloriesBurned;
+  const caloriesProgress = (dailyStats.caloriesConsumed / caloriesTarget) * 100;
 
   return (
     <div className="space-y-4 p-4">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Hey Champion! 💪</h1>
+        <h1 className="text-3xl font-bold">Hey {userProfile?.name}! 💪</h1>
         <p className="text-muted-foreground">Let's crush your goals today</p>
       </div>
 
@@ -34,7 +30,7 @@ export default function Home() {
             </div>
             <div>
               <p className="text-sm font-medium opacity-90">Current Streak</p>
-              <p className="text-3xl font-bold">{dailyStats.streak} Days</p>
+              <p className="text-3xl font-bold">{streak} Days</p>
             </div>
           </div>
           <Award className="h-12 w-12 opacity-80" />
@@ -47,7 +43,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Daily Calories</h3>
             <span className="text-sm text-muted-foreground">
-              {dailyStats.caloriesConsumed} / {dailyStats.caloriesTarget} kcal
+              {dailyStats.caloriesConsumed} / {caloriesTarget} kcal
             </span>
           </div>
           
@@ -84,11 +80,11 @@ export default function Home() {
             <div className="mb-2 flex justify-between text-sm">
               <span className="font-medium">Protein</span>
               <span className="text-muted-foreground">
-                {dailyStats.protein.current}g / {dailyStats.protein.target}g
+                {dailyStats.protein}g / {macrosTarget.protein}g
               </span>
             </div>
             <Progress 
-              value={(dailyStats.protein.current / dailyStats.protein.target) * 100} 
+              value={(dailyStats.protein / macrosTarget.protein) * 100} 
               className="h-2 bg-muted [&>div]:bg-primary"
             />
           </div>
@@ -97,11 +93,11 @@ export default function Home() {
             <div className="mb-2 flex justify-between text-sm">
               <span className="font-medium">Carbs</span>
               <span className="text-muted-foreground">
-                {dailyStats.carbs.current}g / {dailyStats.carbs.target}g
+                {dailyStats.carbs}g / {macrosTarget.carbs}g
               </span>
             </div>
             <Progress 
-              value={(dailyStats.carbs.current / dailyStats.carbs.target) * 100} 
+              value={(dailyStats.carbs / macrosTarget.carbs) * 100} 
               className="h-2 bg-muted [&>div]:bg-success"
             />
           </div>
@@ -110,11 +106,11 @@ export default function Home() {
             <div className="mb-2 flex justify-between text-sm">
               <span className="font-medium">Fat</span>
               <span className="text-muted-foreground">
-                {dailyStats.fat.current}g / {dailyStats.fat.target}g
+                {dailyStats.fat}g / {macrosTarget.fat}g
               </span>
             </div>
             <Progress 
-              value={(dailyStats.fat.current / dailyStats.fat.target) * 100} 
+              value={(dailyStats.fat / macrosTarget.fat) * 100} 
               className="h-2 bg-muted [&>div]:bg-warning"
             />
           </div>
@@ -123,15 +119,18 @@ export default function Home() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-4">
-        <Button size="lg" className="h-auto flex-col gap-2 py-6">
+        <Button size="lg" className="h-auto flex-col gap-2 py-6" onClick={() => navigate("/workouts")}>
           <Dumbbell className="h-6 w-6" />
           <span>Start Workout</span>
         </Button>
-        <Button size="lg" variant="outline" className="h-auto flex-col gap-2 py-6">
+        <Button size="lg" variant="outline" className="h-auto flex-col gap-2 py-6" onClick={() => navigate("/nutrition")}>
           <Apple className="h-6 w-6" />
           <span>Log Meal</span>
         </Button>
       </div>
+
+      {/* AI Coach */}
+      <AICoach />
 
       {/* Motivational Message */}
       <Card className="fitness-card border-l-4 border-l-primary">
